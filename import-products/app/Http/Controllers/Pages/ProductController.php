@@ -23,11 +23,11 @@ class ProductController extends Controller
     }
 
     public function import(): string {
-        return 'Import';
+        return view('products.import');
     }
 
     public function item(string $id): string {
-        return $id;
+        return view('products.item');
     }
 
 }
