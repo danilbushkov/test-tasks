@@ -4,5 +4,6 @@ pkgs.mkShellNoCC {
         php83
         php83Packages.composer
         phpactor
+        vscode-langservers-extracted
     ];
 }
