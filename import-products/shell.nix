@@ -5,5 +5,7 @@ pkgs.mkShellNoCC {
         php83Packages.composer
         phpactor
         vscode-langservers-extracted
+        docker
+        postgresql
     ];
 }

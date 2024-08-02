@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+
+  db:
+    container_name: import-products-pgsql
+    image: postgres:latest
+    restart: always
+    shm_size: 128mb
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - ./database/pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
