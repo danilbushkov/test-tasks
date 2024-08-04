@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Pages;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function list(Request $request): RedirectResponse | string {
+    public function list(Request $request): RedirectResponse | View {
         $page = $request->input('page');
         if($page !== null) {
             if(!is_int($page)) {
@@ -19,7 +21,9 @@ class ProductController extends Controller
             $page = 1;
         }
 
-        return view('products.list');
+        $products = Product::select('name')->get();
+
+        return view('products.list', ['products' => $products]);
     }
 
     public function import(): string {

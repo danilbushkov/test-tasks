@@ -4,7 +4,10 @@
         <title>@yield('title')</title>
     </head>
     <body>
-        <header></header>
+        <header>
+        <a href="/products/">Список</a>
+        <a href="/products/import">Импортировать</a>
+        </header>
 
         <div class="container">
             @yield('content')
