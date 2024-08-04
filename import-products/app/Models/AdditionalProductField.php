@@ -5,16 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class AdditionalProductField extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'external_code',
-        'name',
-        'description',
-        'price',
-        'discount'
+        'key',
+        'value',
+        'product_id'
     ];
-
 }
