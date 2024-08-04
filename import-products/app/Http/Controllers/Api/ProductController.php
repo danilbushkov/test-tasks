@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Maatwebsite\Excel\Facades\Excel;
+use Throwable;
 
 class ProductController extends Controller
 {
@@ -28,9 +29,16 @@ class ProductController extends Controller
                 ],
             ], 422);
         }
-        echo 'test';
-        Excel::import(new ProductsImport, $file);
 
+        try {
+            Excel::import(new ProductsImport, $file);
+        } catch (Throwable $e) {
+            return response()->json([
+                'error' => [
+                    'message' => 'Ошибка при считывании файла. Возможно, заданы не все необходимые поля',
+                ]
+            ], 422);
+        }
 
         return response(null, 204);
     }
