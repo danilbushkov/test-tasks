@@ -10,10 +10,10 @@ use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function list(Request $request): RedirectResponse | View {
+    public function list(Request $request): View|RedirectResponse {
         $page = $request->input('page');
         if($page !== null) {
-            if(!ctype_digit($page) || (int)$page < 1) {
+            if(!ctype_digit($page)) {
                 return redirect('/products?page=1');
             }
 
@@ -46,12 +46,27 @@ class ProductController extends Controller
         ]);
     }
 
-    public function import(): string {
+    public function import(): View {
         return view('products.import');
     }
 
-    public function item(string $id): string {
-        return view('products.item');
+    public function item(string $id): View|RedirectResponse {
+        if(!ctype_digit($id)) {
+            return redirect('/products?page=1');
+        }
+
+        $product = Product::find($id);
+        $pictures = $product->pictures;
+        $additionalFields = $product->additionalFields;
+
+        if($product === null) {
+            return redirect('/products?page=1');
+        }
+        return view('products.item', [
+            'product' => $product,
+            'pictures' => $pictures,
+            'additionalFields' => $additionalFields,
+        ]);
     }
 
 }

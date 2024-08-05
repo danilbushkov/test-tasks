@@ -5,7 +5,9 @@
 @section('content')
     <p>Список товаров</p>
     @foreach ($products as $product)
-        <a href="/products/1">{{ $product->id }} {{ $product->name }}</a><br/>
+        <a href="/products/{{$product->id}}">
+            {{ $product->id }} {{ $product->name }}
+        </a><br/>
     @endforeach
     @if ($page > 1)
         <a href="/products?page={{$page-1}}">{{"<"}}</a>

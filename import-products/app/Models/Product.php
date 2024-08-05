@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -16,5 +17,10 @@ class Product extends Model
         'price',
         'discount'
     ];
-
+    public function additionalFields(): HasMany {
+        return $this->hasMany(AdditionalProductField::class);
+    }
+    public function pictures(): HasMany {
+        return $this->hasMany(ProductPicture::class);
+    }
 }
