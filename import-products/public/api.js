@@ -9,7 +9,7 @@ async function sendFile() {
   if(file != null) {
     let data = new FormData();
     data.append('file', file);
-
+    error.innerHTML = "Загрузка...";
     let response = await fetch("/api/products/import", {
       method: "POST",
       body: data,

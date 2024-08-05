@@ -6,6 +6,8 @@ use App\Models\AdditionalProductField;
 use App\Models\Product;
 use App\Models\ProductPicture;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
@@ -35,9 +37,19 @@ class ProductsImport implements ToCollection, WithHeadingRow
                         $key = str_replace("Доп. поле: ", "", $key);
                         if($key === 'Ссылки на фото') {
                             $links = explode(',', str_replace(' ', '', $value));
+                            $i = 1;
                             foreach($links as $link) {
+                                $fileName = basename($link);
+                                $i++;
+                                $response = Http::get($link);
+                                $savePath = 'public/pictures/' . $fileName;
+                                if(!Storage::disk('local')->exists($savePath)) {
+                                    Storage::disk('local')->put(
+                                        $savePath,
+                                        $response->body());
+                                }
                                 ProductPicture::create([
-                                    'path' => "",
+                                    'path' => "/storage/pictures/".$fileName,
                                     'link' => $link,
                                     'product_id' => $product->id
                                 ]);

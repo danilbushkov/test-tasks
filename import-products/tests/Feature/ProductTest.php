@@ -38,6 +38,9 @@ class ProductTest extends TestCase
     public function test_import_products_with_valid_xlsx_file(): void {
         $path = Storage::path('tests/import_example_small.xlsx');
         $file = new UploadedFile($path, 'import_example.xlsx', null, null, true);
+
+
+        Storage::fake('local');
         $response = $this->post('/api/products/import', [
             'file' => $file
         ]);
@@ -66,5 +69,9 @@ class ProductTest extends TestCase
             'link' => 'http://catalog.collant.ru/pics/SNL-504038_b2.jpg',
             'product_id' => 1
         ]);
+
+        Storage::disk('local')->assertExists('public/pictures/SNL-504038_m.jpg');
+        Storage::disk('local')->assertExists('public/pictures/SNL-454043_b1.jpg');
+        Storage::disk('local')->assertMissing('public/pictures/7_1.jpg');
     }
 }

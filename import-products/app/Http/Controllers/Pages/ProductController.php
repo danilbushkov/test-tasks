@@ -56,12 +56,13 @@ class ProductController extends Controller
         }
 
         $product = Product::find($id);
-        $pictures = $product->pictures;
-        $additionalFields = $product->additionalFields;
-
         if($product === null) {
             return redirect('/products?page=1');
         }
+        $pictures = $product->pictures;
+        $additionalFields = $product->additionalFields;
+
+
         return view('products.item', [
             'product' => $product,
             'pictures' => $pictures,

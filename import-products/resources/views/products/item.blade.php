@@ -20,7 +20,7 @@
         </div><br/>
         <div class = "product-pictures">
             @foreach ($pictures as $picture)
-                {{ $picture->path }}
+                <img src="{{ $picture->path }}" width="100"/>
             @endforeach
         </div><br/>
         <div class = "additional-product-field-title">
