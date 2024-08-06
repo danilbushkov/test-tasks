@@ -10,32 +10,41 @@
 
 ## Установка
 
-Для сборки выполните:
+Скачайте репозиторий и перейдите в папку проекта:
+
+```console
+$ git clone https://github.com/danilbushkov/test-tasks.git
+$ cd test-tasks/import-products
 
 ```
-make build
+
+
+Для сборки выполните:
+
+```console
+$ make build
 ```
 
 Для выполнения команды может потребоваться права суперпользователя.
 
 ## Запуск
 
-```
-make run
+```console
+$ make run
 ```
 
 Если не выполнена миграция базы данных, то выполните:
 
-```
-make migrate
+```console
+$ make migrate
 ```
 
 Для просмотра перейдите по `localhost:8080`.
 
 ## Остановка
 
-```
-make stop
+```console
+$ make stop
 ```
 
 
