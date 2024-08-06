@@ -7,5 +7,8 @@ pkgs.mkShellNoCC {
         vscode-langservers-extracted
         docker
         postgresql
+        gnumake
+        dockerfile-language-server-nodejs
+        yaml-language-server
     ];
 }
