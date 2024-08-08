@@ -15,7 +15,11 @@ env:
 	[ ! -f .env ] && cp .env.example .env; true
 
 db:
-	psql -h localhost -p 5432 -U ${POSTGRES_USER}
+	PGPASSWORD=${POSTGRES_PASSWORD} psql \
+		-h localhost \
+		-p 5432 \
+		-U ${POSTGRES_USER} \
+		${POSTGRES_DB}
 
 clear:
 	rm -r database/pgdata
