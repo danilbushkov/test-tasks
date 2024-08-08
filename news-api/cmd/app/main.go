@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	a "github.com/danilbushkov/test-tasks/internal/app"
+)
 
 func main() {
-	fmt.Println("test")
+	a.New().Run()
 }
