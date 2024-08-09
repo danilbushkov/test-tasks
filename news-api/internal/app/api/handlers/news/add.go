@@ -1,7 +1,7 @@
 package news
 
 import (
-	"github.com/danilbushkov/test-tasks/internal/app/models"
+	"github.com/danilbushkov/test-tasks/internal/app/db/models"
 	"github.com/gofiber/fiber/v2"
 )
 
