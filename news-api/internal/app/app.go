@@ -3,26 +3,25 @@ package app
 import (
 	"log"
 
-	"github.com/danilbushkov/test-tasks/internal/app/config"
-	"github.com/gofiber/fiber/v2"
+	"github.com/danilbushkov/test-tasks/internal/app/api"
+	"github.com/danilbushkov/test-tasks/internal/app/context"
 )
 
 type App struct {
-	Config *config.Config
+	Context *context.AppContext
 }
 
 func New() *App {
-	return &App{
-		Config: config.New(),
+	app := &App{
+		Context: context.New(),
 	}
+
+	api.New(app.Context).Reg()
+
+	return app
 }
 
 func (a *App) Run() {
-	app := fiber.New()
 
-	app.Get("/list", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
-
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(a.Context.Fiber.Listen(":3000"))
 }
