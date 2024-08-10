@@ -31,6 +31,6 @@ func (nh *NewsHandlers) Add(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(map[string]int64{
-		"id": id,
+		"Id": id,
 	})
 }

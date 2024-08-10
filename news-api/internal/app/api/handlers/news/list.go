@@ -22,5 +22,8 @@ func (nh *NewsHandlers) List(c *fiber.Ctx) error {
 			})
 		}
 	}
-	return c.JSON(list)
+	return c.JSON(map[string]any{
+		"Success": true,
+		"News":    list,
+	})
 }
