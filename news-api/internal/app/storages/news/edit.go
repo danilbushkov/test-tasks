@@ -30,13 +30,51 @@ func (s *NewsStorage) Edit(news *structs.News) error {
 		n.Content = *news.Content
 		columns = append(columns, "content")
 	}
+	tx, err := s.db.Orm().Begin()
+	if err != nil {
+		return fmt.Errorf("%w: %w", e.ErrDatabase, err)
+	}
 
-	if err := s.db.Orm().UpdateColumns(n, columns...); err != nil {
-		if err == reform.ErrNoRows {
-			return errors.New("News does not exist")
-		} else {
+	defer tx.Rollback()
+
+	if len(columns) != 0 {
+		if err := tx.UpdateColumns(n, columns...); err != nil {
+			if err == reform.ErrNoRows {
+				return errors.New("News does not exist")
+			} else {
+				return fmt.Errorf("%w: %w", e.ErrDatabase, err)
+			}
+		}
+	}
+	if news.Categories != nil {
+		placeholder := s.db.Orm().Placeholder(1)
+		tail := fmt.Sprintf("WHERE news_id = %s", placeholder)
+		if _, err = tx.DeleteFrom(
+			models.NewsCategoriesView,
+			tail,
+			n.ID,
+		); err != nil {
 			return fmt.Errorf("%w: %w", e.ErrDatabase, err)
 		}
+		if len(*news.Categories) != 0 {
+			categories := []reform.Struct{}
+			for i := 0; i < len(*news.Categories); i++ {
+				category := models.NewsCategories{
+					NewID:      n.ID,
+					CategoryId: (*news.Categories)[i],
+				}
+				categories = append(categories, &category)
+			}
+			err = tx.InsertMulti(categories...)
+			if err != nil {
+				return fmt.Errorf("%w: %w", e.ErrDatabase, err)
+			}
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return fmt.Errorf("%w: %w", e.ErrDatabase, err)
 	}
 
 	return nil
