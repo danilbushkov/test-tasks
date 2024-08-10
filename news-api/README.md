@@ -4,8 +4,34 @@
 
 Подробное описание находится [здесь](./go-test.md).
 
+
 ## Запуск
 
+### Установка
+
+Скачайте репозиторий и перейдите в папку проекта:
+
+```console
+$ git clone https://github.com/danilbushkov/test-tasks.git
+```
+```console
+$ cd test-tasks/news-api
+
+```
+
+### Запуск
+
+```console
+$ make run
+```
+
+Доступ по `localhost:3000`.
+
+### Остановка
+
+```console
+$ make stop
+```
 
 ## API
 

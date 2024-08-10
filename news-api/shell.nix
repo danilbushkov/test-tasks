@@ -6,5 +6,6 @@ pkgs.mkShellNoCC {
         yaml-language-server
         go
         gopls
+        dockerfile-language-server-nodejs
     ];
 }

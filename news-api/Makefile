@@ -2,7 +2,7 @@
 
 all: run
 
-run:
+run: env
 	docker compose up -d
 
 stop:
