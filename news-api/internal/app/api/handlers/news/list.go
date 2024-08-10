@@ -15,9 +15,9 @@ func (nh *NewsHandlers) List(c *fiber.Ctx) error {
 	if err != nil {
 		if errors.Is(err, app_err.ErrDatabase) {
 			nh.appContext.Log.Error(err)
-			c.SendStatus(fiber.StatusInternalServerError)
+			return c.SendStatus(fiber.StatusInternalServerError)
 		} else {
-			c.JSON(structs.Error{
+			return c.Status(fiber.StatusUnprocessableEntity).JSON(structs.Error{
 				Message: err.Error(),
 			})
 		}
