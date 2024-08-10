@@ -8,20 +8,20 @@ import (
 	"github.com/danilbushkov/test-tasks/internal/app/structs"
 )
 
-func (s *NewsStorage) Add(news *structs.News) error {
+func (s *NewsStorage) Add(news *structs.News) (int64, error) {
 	if err := news.CheckTitle(); err != nil {
-		return err
+		return 0, err
 	}
 	if err := news.CheckContent(); err != nil {
-		return err
+		return 0, err
 	}
 	n := &models.News{
 		Title:   *news.Title,
 		Content: *news.Content,
 	}
 	if err := s.db.Orm().Save(n); err != nil {
-		return fmt.Errorf("%w: %w", errors.ErrDatabase, err)
+		return 0, fmt.Errorf("%w: %w", errors.ErrDatabase, err)
 	}
 
-	return nil
+	return n.ID, nil
 }

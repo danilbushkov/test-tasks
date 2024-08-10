@@ -15,7 +15,7 @@ func (s *NewsStorage) Delete(id int64) error {
 	}
 	if err := s.db.Orm().Delete(n); err != nil {
 		if err == reform.ErrNoRows {
-			return errors.New("News did not exist")
+			return errors.New("News does not exist")
 		} else {
 			return fmt.Errorf("%w: %w", e.ErrDatabase, err)
 		}

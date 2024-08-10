@@ -18,7 +18,8 @@ func (nh *NewsHandlers) Add(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 	newsStorage := ns.NewFromAppContext(nh.appContext)
-	if err := newsStorage.Add(n); err != nil {
+	id, err := newsStorage.Add(n)
+	if err != nil {
 		if errors.Is(err, app_err.ErrDatabase) {
 			nh.appContext.Log.Error(err)
 			return c.SendStatus(fiber.StatusInternalServerError)
@@ -28,5 +29,8 @@ func (nh *NewsHandlers) Add(c *fiber.Ctx) error {
 			})
 		}
 	}
-	return c.SendStatus(fiber.StatusCreated)
+
+	return c.Status(fiber.StatusCreated).JSON(map[string]int64{
+		"id": id,
+	})
 }

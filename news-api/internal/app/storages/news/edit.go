@@ -33,7 +33,7 @@ func (s *NewsStorage) Edit(news *structs.News) error {
 
 	if err := s.db.Orm().UpdateColumns(n, columns...); err != nil {
 		if err == reform.ErrNoRows {
-			return errors.New("News did not exist")
+			return errors.New("News does not exist")
 		} else {
 			return fmt.Errorf("%w: %w", e.ErrDatabase, err)
 		}
