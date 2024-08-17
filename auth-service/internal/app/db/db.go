@@ -1,24 +1,19 @@
 package db
 
 import (
-	"database/sql"
-	"errors"
+	"context"
 	"fmt"
 
 	"github.com/danilbushkov/test-tasks/internal/app/config"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/reform.v1"
-	"gopkg.in/reform.v1/dialects/postgresql"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type DB struct {
-	sqlDB *sql.DB
-	db    *reform.DB
+	Pool *pgxpool.Pool
 }
 
-func New(cf *config.DBConfig, log *logrus.Logger) (*DB, error) {
+func New(cf *config.DBConfig) (*DB, error) {
 	connString := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		cf.Conn.User,
@@ -26,25 +21,14 @@ func New(cf *config.DBConfig, log *logrus.Logger) (*DB, error) {
 		cf.Conn.Host,
 		cf.Conn.Port,
 		cf.Conn.DB)
-	sqlDB, err := sql.Open("postgres", connString)
+	pool, err := pgxpool.New(context.Background(), connString)
 	if err != nil {
 		return nil, err
 	}
-	if err = sqlDB.Ping(); err != nil {
-		return nil, errors.New("database unreachable")
-	}
 
-	db := reform.NewDB(
-		sqlDB,
-		postgresql.Dialect,
-		reform.NewPrintfLogger(log.Printf))
-	return &DB{sqlDB: sqlDB, db: db}, nil
-}
-
-func (db *DB) Orm() *reform.DB {
-	return db.db
+	return &DB{Pool: pool}, nil
 }
 
 func (db *DB) Close() {
-	db.sqlDB.Close()
+	db.Pool.Close()
 }

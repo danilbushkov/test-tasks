@@ -21,7 +21,7 @@ func New() *App {
 	}
 	log := logrus.New()
 
-	d, err := db.New(cf.DB, log)
+	d, err := db.New(cf.DB)
 	if err != nil {
 		log.Fatal(err)
 	}
