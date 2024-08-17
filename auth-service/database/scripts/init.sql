@@ -1,6 +1,3 @@
---
--- Структура таблицы `News`
---
 
 CREATE TABLE auth (
   uuid UUID PRIMARY KEY,
