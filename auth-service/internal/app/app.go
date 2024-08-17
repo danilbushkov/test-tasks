@@ -20,7 +20,6 @@ func New() *App {
 		log.Fatal(err)
 	}
 	log := logrus.New()
-	log.Print(cf.Token)
 
 	d, err := db.New(cf.DB, log)
 	if err != nil {
