@@ -23,5 +23,5 @@ func (api *Api) registrar() *fiber.App {
 }
 
 func (api *Api) Reg() {
-	api.regNewsApi()
+	api.regAuthApi()
 }
