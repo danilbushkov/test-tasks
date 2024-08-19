@@ -10,7 +10,7 @@ import (
 )
 
 type DB struct {
-	Pool *pgxpool.Pool
+	Pool PgxPoolIface
 }
 
 func New(cf *config.DBConfig) (*DB, error) {

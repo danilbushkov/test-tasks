@@ -7,11 +7,28 @@ import (
 	"github.com/danilbushkov/test-tasks/internal/app/config"
 	"github.com/danilbushkov/test-tasks/internal/app/context"
 	"github.com/danilbushkov/test-tasks/internal/app/db"
+	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 )
 
 type App struct {
 	Context *context.AppContext
+}
+
+func NewWithDB(db *db.DB) *App {
+	cf, err := config.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log := logrus.New()
+
+	app := &App{
+		Context: context.New(cf, db, log),
+	}
+
+	api.New(app.Context).Reg()
+
+	return app
 }
 
 func New() *App {
@@ -34,8 +51,16 @@ func New() *App {
 	return app
 }
 
+func (a *App) Api() *fiber.App {
+	return a.Context.Fiber
+}
+
 func (a *App) Run() {
-	defer a.Context.DB.Close()
+	defer a.Close()
 
 	log.Fatal(a.Context.Fiber.Listen(":3000"))
+}
+
+func (a *App) Close() {
+	a.Context.DB.Close()
 }
