@@ -14,9 +14,11 @@ type Config struct {
 func New() (*Config, error) {
 	accessLifeTime := uint64(600)
 	refreshLifeTime := uint64(86400)
+	accessKey := "secret"
 
 	r := os.Getenv("REFRESH_LIFE_TIME")
 	a := os.Getenv("ACCESS_LIFE_TIME")
+	k := os.Getenv("ACCESS_KEY")
 
 	if r != "" {
 		num, err := strconv.ParseUint(r, 10, 64)
@@ -32,6 +34,10 @@ func New() (*Config, error) {
 		}
 		accessLifeTime = num
 	}
+	if k != "" {
+		accessKey = k
+	}
+
 	return &Config{
 		DB: &DBConfig{
 			Conn: &ConnConfig{
@@ -45,6 +51,7 @@ func New() (*Config, error) {
 		Token: &TokenConfig{
 			AccessLifeTime:  accessLifeTime,
 			RefreshLifeTime: refreshLifeTime,
+			AccessKey:       accessKey,
 		},
 	}, nil
 }
