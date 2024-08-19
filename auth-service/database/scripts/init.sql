@@ -1,9 +1,6 @@
 
 CREATE TABLE auth (
-  uuid UUID PRIMARY KEY,
-  refresh_token TEXT NOT NULL,
-  ip INET NOT NULL,
-  expiration TIMESTAMP
+  refresh_token TEXT PRIMARY KEY
 );
 
 
