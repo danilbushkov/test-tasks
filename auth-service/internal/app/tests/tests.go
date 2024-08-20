@@ -8,12 +8,12 @@ import (
 	"github.com/pashagolub/pgxmock/v4"
 )
 
-func getTestApp() (*app.App, error) {
+func getTestApp() (*app.App, pgxmock.PgxPoolIface, error) {
 	mock, err := pgxmock.NewPool()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return app.NewWithDB(&db.DB{Pool: mock}), nil
+	return app.NewWithDB(&db.DB{Pool: mock}), mock, nil
 }
 
 func setEnv(t *testing.T) {

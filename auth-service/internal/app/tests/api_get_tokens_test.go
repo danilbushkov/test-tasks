@@ -10,10 +10,11 @@ import (
 	"github.com/danilbushkov/test-tasks/internal/app/services/auth/tokens"
 	"github.com/danilbushkov/test-tasks/internal/app/structs"
 	"github.com/gofiber/fiber/v2"
+	"github.com/pashagolub/pgxmock/v4"
 )
 
 func TestApiNotFound(t *testing.T) {
-	app, err := getTestApp()
+	app, _, err := getTestApp()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +26,7 @@ func TestApiNotFound(t *testing.T) {
 }
 
 func TestApiGetTokensWithEmptyJsonObject(t *testing.T) {
-	app, err := getTestApp()
+	app, _, err := getTestApp()
 	defer app.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -53,7 +54,7 @@ func TestApiGetTokensWithEmptyJsonObject(t *testing.T) {
 }
 
 func TestApiGetTokensWithInvalidUUIDLength(t *testing.T) {
-	app, err := getTestApp()
+	app, _, err := getTestApp()
 	defer app.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -82,7 +83,7 @@ func TestApiGetTokensWithInvalidUUIDLength(t *testing.T) {
 }
 
 func TestApiGetTokensWithInvalidUUID(t *testing.T) {
-	app, err := getTestApp()
+	app, _, err := getTestApp()
 	defer app.Close()
 	if err != nil {
 		t.Fatal(err)
@@ -113,7 +114,10 @@ func TestApiGetTokensWithInvalidUUID(t *testing.T) {
 
 func TestApiGetTokensWithValidUUID(t *testing.T) {
 	setEnv(t)
-	app, err := getTestApp()
+	app, mock, err := getTestApp()
+
+	mock.ExpectExec("INSERT INTO auth").WithArgs([]byte{1, 1, 1}).WillReturnResult(pgxmock.NewResult("INSERT", 1))
+
 	defer app.Close()
 	if err != nil {
 		t.Fatal(err)

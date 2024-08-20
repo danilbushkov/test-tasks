@@ -32,10 +32,10 @@ func (as *AuthService) Get(uuid *uuid.UUID, ip string) (*structs.Tokens, error) 
 	}
 	//hash, err := bcrypt.GenerateFromPassword(rt.Signature, bcrypt.DefaultCost)
 
-	//	err := as.authStorage.AddRefreshToken(hash)
-	//	if err != nil {
-	//		return nil, err
-	//	}
+	err = as.authStorage.AddRefreshToken([]byte{1, 1, 1})
+	if err != nil {
+		return nil, err
+	}
 
 	return &structs.Tokens{
 		AccessToken:  accessToken,
