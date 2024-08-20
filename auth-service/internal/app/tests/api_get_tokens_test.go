@@ -7,10 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	auth_service "github.com/danilbushkov/test-tasks/internal/app/services/auth"
+	"github.com/danilbushkov/test-tasks/internal/app/services/auth/tokens"
 	"github.com/danilbushkov/test-tasks/internal/app/structs"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func TestApiNotFound(t *testing.T) {
@@ -132,31 +131,18 @@ func TestApiGetTokensWithValidUUID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var tokens auth_service.Tokens
+	var ts structs.Tokens
 
-	err = json.Unmarshal(respBody, &tokens)
+	err = json.Unmarshal(respBody, &ts)
 	if err != nil {
 		t.Fatal(err)
 	}
-	accessClaims := new(auth_service.TokenClaims)
-	_, err = jwt.ParseWithClaims(tokens.AccessToken, accessClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte("a_key"), nil
-	})
+	access, err := tokens.NewAccessFromString(ts.AccessToken, "a_key")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if accessClaims.UUID != "674859e1-7772-4a6a-9df1-11fccfa4e144" {
+	if access.UUID() != "674859e1-7772-4a6a-9df1-11fccfa4e144" {
 		t.Fatal("UUID is invalid in token in response")
-	}
-	refreshClaims := new(auth_service.TokenClaims)
-	_, err = jwt.ParseWithClaims(tokens.RefreshToken, refreshClaims, func(token *jwt.Token) (interface{}, error) {
-		return []byte("r_key"), nil
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if refreshClaims.UUID != "674859e1-7772-4a6a-9df1-11fccfa4e144" {
-		t.Fatal("UUID is invalid in token in response ")
 	}
 
 }

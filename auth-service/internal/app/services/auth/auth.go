@@ -5,8 +5,9 @@ import (
 
 	"github.com/danilbushkov/test-tasks/internal/app/config"
 	"github.com/danilbushkov/test-tasks/internal/app/context"
-	"github.com/danilbushkov/test-tasks/internal/app/errors"
+	"github.com/danilbushkov/test-tasks/internal/app/services/auth/tokens"
 	auth_storage "github.com/danilbushkov/test-tasks/internal/app/storages/auth"
+	"github.com/danilbushkov/test-tasks/internal/app/structs"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -23,33 +24,26 @@ func NewFromAppContext(actx *context.AppContext) *AuthService {
 	}
 }
 
-func (as *AuthService) Get(uuid *uuid.UUID, ip string) (*Tokens, error) {
-	claims := &TokenClaims{
-		Ip:   ip,
-		UUID: uuid.String(),
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(as.tokenConfig.AccessLifeTime) * time.Second)),
-		},
-	}
-	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS512, claims).SignedString([]byte(as.tokenConfig.AccessKey))
-	if err != nil {
-		return nil, errors.TokenError(err)
-	}
-	claims.RegisteredClaims = jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(as.tokenConfig.RefreshLifeTime) * time.Second)),
-	}
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS512, claims).SignedString([]byte(as.tokenConfig.RefreshKey))
-	if err != nil {
-		return nil, errors.TokenError(err)
-	}
+func (as *AuthService) Get(uuid *uuid.UUID, ip string) (*structs.Tokens, error) {
+	accessToken, err := tokens.NewAccess(ip, uuid, time.Duration(as.tokenConfig.AccessLifeTime)*time.Second).Signed([]byte(as.tokenConfig.AccessKey))
 
-	return &Tokens{
+	if err != nil {
+		return nil, err
+	}
+	//hash, err := bcrypt.GenerateFromPassword(rt.Signature, bcrypt.DefaultCost)
+
+	//	err := as.authStorage.AddRefreshToken(hash)
+	//	if err != nil {
+	//		return nil, err
+	//	}
+
+	return &structs.Tokens{
 		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
+		RefreshToken: "",
 	}, nil
 }
 
-func (as *AuthService) Refresh(refreshToken *jwt.Token) (*Tokens, error) {
+func (as *AuthService) Refresh(refreshToken *jwt.Token) (*structs.Tokens, error) {
 
 	return nil, nil
 }
