@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 
 	ctx "github.com/danilbushkov/test-tasks/internal/app/context"
 	"github.com/danilbushkov/test-tasks/internal/app/db"
@@ -31,7 +30,7 @@ func (as *AuthStorage) AddRefreshToken(hash []byte) error {
 		hash,
 	)
 	if err != nil {
-		return fmt.Errorf("%w: %w", e.ErrDatabase, err)
+		return e.DatabaseError(err)
 	}
 
 	return nil
@@ -44,7 +43,7 @@ func (as *AuthStorage) DeleteRefreshToken(hash []byte) (bool, error) {
 		hash,
 	)
 	if err != nil {
-		return false, fmt.Errorf("%w: %w", e.ErrDatabase, err)
+		return false, e.DatabaseError(err)
 	}
 	if commandTag.RowsAffected() != 1 {
 		return false, nil

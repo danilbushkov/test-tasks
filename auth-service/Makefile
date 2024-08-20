@@ -24,7 +24,7 @@ db:
 clear:
 	rm -r database/pgdata
 
-run-dev:
+run-dev: env
 	./run-dev.sh
 
 test:

@@ -15,10 +15,12 @@ func New() (*Config, error) {
 	accessLifeTime := uint64(600)
 	refreshLifeTime := uint64(86400)
 	accessKey := "secret"
+	refreshKey := "refresh_secret"
 
 	r := os.Getenv("REFRESH_LIFE_TIME")
 	a := os.Getenv("ACCESS_LIFE_TIME")
-	k := os.Getenv("ACCESS_KEY")
+	ak := os.Getenv("ACCESS_KEY")
+	rk := os.Getenv("REFRESH_KEY")
 
 	if r != "" {
 		num, err := strconv.ParseUint(r, 10, 64)
@@ -34,8 +36,11 @@ func New() (*Config, error) {
 		}
 		accessLifeTime = num
 	}
-	if k != "" {
-		accessKey = k
+	if ak != "" {
+		accessKey = ak
+	}
+	if rk != "" {
+		refreshKey = rk
 	}
 
 	return &Config{
@@ -52,6 +57,7 @@ func New() (*Config, error) {
 			AccessLifeTime:  accessLifeTime,
 			RefreshLifeTime: refreshLifeTime,
 			AccessKey:       accessKey,
+			RefreshKey:      refreshKey,
 		},
 	}, nil
 }
