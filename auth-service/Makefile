@@ -26,3 +26,6 @@ clear:
 
 run-dev:
 	./run-dev.sh
+
+test:
+	go test ./internal/app/tests
