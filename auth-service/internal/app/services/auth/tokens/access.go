@@ -19,12 +19,12 @@ type AccessToken struct {
 	claims *AccessTokenClaims
 }
 
-func NewAccess(ip string, uuid *uuid.UUID, liveTime time.Duration) *AccessToken {
+func NewAccess(ip string, uuid *uuid.UUID, exp time.Time) *AccessToken {
 	claims := &AccessTokenClaims{
 		Ip:   ip,
 		UUID: uuid.String(),
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(liveTime)),
+			ExpiresAt: jwt.NewNumericDate(exp),
 		},
 	}
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)

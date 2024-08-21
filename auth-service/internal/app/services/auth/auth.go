@@ -15,31 +15,42 @@ import (
 type AuthService struct {
 	authStorage *auth_storage.AuthStorage
 	tokenConfig *config.TokenConfig
+	timeNow     func() time.Time
 }
 
 func NewFromAppContext(actx *context.AppContext) *AuthService {
 	return &AuthService{
 		authStorage: auth_storage.NewFromAppContext(actx),
 		tokenConfig: actx.Config.Token,
+		timeNow:     actx.TimeNow,
 	}
 }
 
 func (as *AuthService) Get(uuid *uuid.UUID, ip string) (*structs.Tokens, error) {
-	accessToken, err := tokens.NewAccess(ip, uuid, time.Duration(as.tokenConfig.AccessLifeTime)*time.Second).Signed([]byte(as.tokenConfig.AccessKey))
+	accessExp := as.timeNow().Add(time.Duration(as.tokenConfig.AccessLifeTime) * time.Second)
+
+	accessToken, err := tokens.NewAccess(ip, uuid, accessExp).Signed([]byte(as.tokenConfig.AccessKey))
 
 	if err != nil {
 		return nil, err
 	}
-	//hash, err := bcrypt.GenerateFromPassword(rt.Signature, bcrypt.DefaultCost)
 
-	err = as.authStorage.AddRefreshToken([]byte{1, 1, 1})
+	refreshExp := as.timeNow().Add(time.Duration(as.tokenConfig.RefreshLifeTime) * time.Second)
+
+	signedRefresh, err := tokens.NewRefresh(ip, uuid, refreshExp).Sign([]byte(as.tokenConfig.RefreshKey))
+
+	hash, err := signedRefresh.SignatureHash()
+	if err != nil {
+		return nil, err
+	}
+	err = as.authStorage.AddRefreshToken(hash)
 	if err != nil {
 		return nil, err
 	}
 
 	return &structs.Tokens{
 		AccessToken:  accessToken,
-		RefreshToken: "",
+		RefreshToken: signedRefresh.Token(),
 	}, nil
 }
 

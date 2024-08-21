@@ -2,6 +2,7 @@ package app
 
 import (
 	"log"
+	"time"
 
 	"github.com/danilbushkov/test-tasks/internal/app/api"
 	"github.com/danilbushkov/test-tasks/internal/app/config"
@@ -15,7 +16,7 @@ type App struct {
 	Context *context.AppContext
 }
 
-func NewWithDB(db *db.DB) *App {
+func NewWithDBAndTimeNow(db *db.DB, timeNow func() time.Time) *App {
 	cf, err := config.New()
 	if err != nil {
 		log.Fatal(err)
@@ -23,7 +24,7 @@ func NewWithDB(db *db.DB) *App {
 	log := logrus.New()
 
 	app := &App{
-		Context: context.New(cf, db, log),
+		Context: context.New(cf, db, log, timeNow),
 	}
 
 	api.New(app.Context).Reg()
@@ -43,7 +44,7 @@ func New() *App {
 		log.Fatal(err)
 	}
 	app := &App{
-		Context: context.New(cf, d, log),
+		Context: context.New(cf, d, log, time.Now),
 	}
 
 	api.New(app.Context).Reg()

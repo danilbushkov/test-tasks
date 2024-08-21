@@ -10,7 +10,7 @@ import (
 
 func HendleError(ac *context.AppContext, c *fiber.Ctx, err error) error {
 	if err != nil {
-		if errors.Is(err, e.ErrDatabase) {
+		if errors.Is(err, e.ErrDatabase) || errors.Is(err, e.ErrToken) {
 			ac.Log.Error(err)
 			return c.SendStatus(fiber.StatusInternalServerError)
 		} else {

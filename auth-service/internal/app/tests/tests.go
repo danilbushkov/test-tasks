@@ -2,6 +2,7 @@ package tests
 
 import (
 	"testing"
+	"time"
 
 	"github.com/danilbushkov/test-tasks/internal/app"
 	"github.com/danilbushkov/test-tasks/internal/app/db"
@@ -13,7 +14,8 @@ func getTestApp() (*app.App, pgxmock.PgxPoolIface, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	return app.NewWithDB(&db.DB{Pool: mock}), mock, nil
+	t := time.Now()
+	return app.NewWithDBAndTimeNow(&db.DB{Pool: mock}, func() time.Time { return t }), mock, nil
 }
 
 func setEnv(t *testing.T) {

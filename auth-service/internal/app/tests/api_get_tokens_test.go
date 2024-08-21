@@ -112,24 +112,32 @@ func TestApiGetTokensWithInvalidUUID(t *testing.T) {
 
 }
 
+type AnyHash struct{}
+
+// Match satisfies sqlmock.Argument interface
+func (a AnyHash) Match(v interface{}) bool {
+	return true
+}
+
 func TestApiGetTokensWithValidUUID(t *testing.T) {
+	u := "674859e1-7772-4a6a-9df1-11fccfa4e144"
+	ip := "0.0.0.0"
 	setEnv(t)
 	app, mock, err := getTestApp()
-
-	mock.ExpectExec("INSERT INTO auth").WithArgs([]byte{1, 1, 1}).WillReturnResult(pgxmock.NewResult("INSERT", 1))
-
 	defer app.Close()
-	if err != nil {
-		t.Fatal(err)
-	}
-	body := `{ "uuid": "674859e1-7772-4a6a-9df1-11fccfa4e144" }`
+
+	mock.ExpectExec("INSERT INTO auth").WithArgs(AnyHash{}).WillReturnResult(pgxmock.NewResult("INSERT", 1))
+
+	body := `{ "uuid": "` + u + `" }`
 	req := httptest.NewRequest("POST", "/api/auth/get", strings.NewReader(body))
 	req.Header.Add("Content-Type", "application/json")
+	req.RemoteAddr = ip
 
 	resp, _ := app.Api().Test(req)
 	if resp.StatusCode != fiber.StatusOK {
 		t.Fatalf("Status code is not 200. Code is %d", resp.StatusCode)
 	}
+
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -145,7 +153,7 @@ func TestApiGetTokensWithValidUUID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if access.UUID() != "674859e1-7772-4a6a-9df1-11fccfa4e144" {
+	if access.UUID() != u {
 		t.Fatal("UUID is invalid in token in response")
 	}
 
