@@ -2,10 +2,12 @@ package auth
 
 import (
 	"context"
+	"errors"
 
 	ctx "github.com/danilbushkov/test-tasks/internal/app/context"
 	"github.com/danilbushkov/test-tasks/internal/app/db"
 	e "github.com/danilbushkov/test-tasks/internal/app/errors"
+	"github.com/google/uuid"
 )
 
 type AuthStorage struct {
@@ -24,9 +26,10 @@ func NewFromAppContext(actx *ctx.AppContext) *AuthStorage {
 	}
 }
 
-func (as *AuthStorage) AddRefreshToken(hash []byte) error {
+func (as *AuthStorage) AddRefreshTokenSignature(uuid *uuid.UUID, hash []byte) error {
 	_, err := as.db.Pool.Exec(context.Background(),
-		"INSERT INTO auth(refresh_token) VALUES ($1)",
+		"INSERT INTO auth(uuid, refresh_token_signature) VALUES ($1, $2)",
+		uuid.String(),
 		hash,
 	)
 	if err != nil {
@@ -36,18 +39,30 @@ func (as *AuthStorage) AddRefreshToken(hash []byte) error {
 	return nil
 }
 
-// Return true if the token has been deleted
-func (as *AuthStorage) DeleteRefreshToken(hash []byte) (bool, error) {
+func (as *AuthStorage) DeleteRefreshTokenSignature(hash []byte) error {
 	commandTag, err := as.db.Pool.Exec(context.Background(),
-		"DELETE FROM auth WHERE refresh_token=$1",
+		"DELETE FROM auth WHERE refresh_token_signature=$1",
 		hash,
 	)
 	if err != nil {
-		return false, e.DatabaseError(err)
+		return e.DatabaseError(err)
 	}
 	if commandTag.RowsAffected() != 1 {
-		return false, nil
+		return errors.New("Signature not found")
 	}
 
-	return true, nil
+	return nil
+}
+
+func (as *AuthStorage) GetRefreshTokenSignature(uuid string) ([]byte, error) {
+	signature := []byte{}
+	err := as.db.Pool.QueryRow(context.Background(),
+		"SELECT refresh_token_signature FROM auth WHERE uuid=$1",
+		uuid,
+	).Scan(signature)
+	if err != nil {
+		return nil, e.DatabaseError(err)
+	}
+
+	return signature, nil
 }

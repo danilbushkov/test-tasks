@@ -1,6 +1,7 @@
 
 CREATE TABLE auth (
-  refresh_token TEXT PRIMARY KEY
+  uuid UUID PRIMARY KEY,
+  refresh_token_signature TEXT NOT NULL UNIQUE
 );
 
 

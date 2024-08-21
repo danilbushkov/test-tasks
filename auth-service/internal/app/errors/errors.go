@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	ErrDatabase = errors.New("Database error")
-	ErrToken    = errors.New("InternalServerError")
+	ErrDatabase        = errors.New("Database error")
+	ErrToken           = errors.New("InternalServerError")
+	ErrTokenIsNotValid = errors.New("Token is not valid")
 )
 
 func TokenError(err error) error {

@@ -5,11 +5,12 @@ import (
 
 	"github.com/danilbushkov/test-tasks/internal/app/config"
 	"github.com/danilbushkov/test-tasks/internal/app/context"
+	"github.com/danilbushkov/test-tasks/internal/app/errors"
 	"github.com/danilbushkov/test-tasks/internal/app/services/auth/tokens"
 	auth_storage "github.com/danilbushkov/test-tasks/internal/app/storages/auth"
 	"github.com/danilbushkov/test-tasks/internal/app/structs"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
@@ -43,7 +44,7 @@ func (as *AuthService) Get(uuid *uuid.UUID, ip string) (*structs.Tokens, error) 
 	if err != nil {
 		return nil, err
 	}
-	err = as.authStorage.AddRefreshToken(hash)
+	err = as.authStorage.AddRefreshTokenSignature(uuid, hash)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +55,37 @@ func (as *AuthService) Get(uuid *uuid.UUID, ip string) (*structs.Tokens, error) 
 	}, nil
 }
 
-func (as *AuthService) Refresh(refreshToken *jwt.Token) (*structs.Tokens, error) {
+func (as *AuthService) Refresh(refreshToken string, ip string) (*structs.Tokens, error) {
+	refresh, err := tokens.ParseSignedRefreshToken(refreshToken)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	uuid, err := uuid.Parse(refresh.UUID)
+	if err != nil {
+		return nil, err
+	}
+	ok, err := refresh.Check([]byte(as.tokenConfig.RefreshKey))
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
+		return nil, errors.ErrTokenIsNotValid
+	}
+
+	signatureHash, err := as.authStorage.GetRefreshTokenSignature(refresh.UUID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword(signatureHash, refresh.Signature())
+	if err != nil {
+		return nil, errors.ErrTokenIsNotValid
+	}
+	err = as.authStorage.DeleteRefreshTokenSignature(signatureHash)
+	if err != nil {
+		return nil, err
+	}
+
+	return as.Get(&uuid, ip)
 }
