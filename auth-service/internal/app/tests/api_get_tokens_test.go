@@ -156,5 +156,30 @@ func TestApiGetTokensWithValidUUID(t *testing.T) {
 	if access.UUID() != u {
 		t.Fatal("UUID is invalid in token in response")
 	}
+	refresh, err := tokens.ParseSignedRefreshToken(ts.RefreshToken)
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	if refresh.UUID != u {
+		t.Fatal("UUID is invalid in token in response")
+	}
+
+	ok, err := refresh.Check([]byte("r_key"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !ok {
+		t.Fatal("Invalid refresh token")
+	}
+
+	ok, err = refresh.Check([]byte("y_key"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if ok {
+		t.Fatal("Invalid refresh token")
+	}
 }

@@ -33,7 +33,7 @@ func (rt *RefreshToken) Sign(key []byte) (*SignedRefreshToken, error) {
 
 	hash := sha512.Sum512(data)
 
-	eData := base64.URLEncoding.EncodeToString(data)
+	eData := base64.URLEncoding.EncodeToString(structure)
 
 	eHash := base64.URLEncoding.EncodeToString(hash[:])
 
