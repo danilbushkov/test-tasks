@@ -1,6 +1,6 @@
 # news-api
 
-Тестовое задание, заключающееся в предоставлении api для новостей.
+Тестовое задание, заключающееся в предоставлении api для генерации и обновления токенов.
 
 Подробное описание находится [здесь](./go-test.md).
 
@@ -15,7 +15,7 @@
 $ git clone https://github.com/danilbushkov/test-tasks.git
 ```
 ```console
-$ cd test-tasks/news-api
+$ cd test-tasks/auth-service
 
 ```
 
@@ -37,71 +37,48 @@ $ make stop
 
 ### Список API:
 
-- Добавление новости
+- Предоставление токенов
 
-`POST /add`
-
-Тело запроса:
-
-```json
-{
-    "Title": "string",
-    "Content": "string"
-}
-```
-
-В ответе содержится id вновь созданной новости в формате:
-
-```json
-{
-    "Id": "int"
-}
-```
-
-- Удаление новости
-
-`DELETE /<id>`
-
-- Обновление новости
-
-`POST /edit/<id>`
+`POST /api/auth/get`
 
 Тело запроса:
 
 ```json
 {
-    "Id": "int",
-    "Title": "string",
-    "Content": "string"
-    "Categories": "Array<int>"
+    "uuid": "string"
 }
 ```
 
-- Список новостей
-
-`GET /list`
-
-Пример тела ответа:
+В ответе содержатся токены:
 
 ```json
 {
-    "Success": true,
-    "News": [
-      {
-        "Id": 64,
-        "Title": "Lorem ipsum",
-        "Content": "Dolor sit amet <b>foo</b>",
-        "Categories": [1,2,3]
-      },
-      {
-        "Id": 1,
-        "Title": "first",
-        "Content": "tratata",
-        "Categories": [1]
-      }
-    ]
+    "accessToken": "string",
+    "refreshToken": "string"
 }
 ```
+
+- Обновление токенов
+
+`POST /api/auth/refresh`
+
+Тело запроса:
+
+```json
+{
+    "refreshToken": "string"
+}
+```
+
+В ответе содержатся токены:
+
+```json
+{
+    "accessToken": "string",
+    "refreshToken": "string"
+}
+```
+
 
 ### Общий формат ответов
 
