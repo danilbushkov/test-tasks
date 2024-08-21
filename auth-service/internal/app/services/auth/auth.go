@@ -7,6 +7,7 @@ import (
 	"github.com/danilbushkov/test-tasks/internal/app/context"
 	"github.com/danilbushkov/test-tasks/internal/app/errors"
 	"github.com/danilbushkov/test-tasks/internal/app/services/auth/tokens"
+	"github.com/danilbushkov/test-tasks/internal/app/services/mail"
 	auth_storage "github.com/danilbushkov/test-tasks/internal/app/storages/auth"
 	"github.com/danilbushkov/test-tasks/internal/app/structs"
 	"github.com/google/uuid"
@@ -44,6 +45,18 @@ func (as *AuthService) Get(uuid *uuid.UUID, ip string) (*structs.Tokens, error) 
 	if err != nil {
 		return nil, err
 	}
+
+	exists, err := as.authStorage.Exists(uuid)
+	if err != nil {
+		return nil, err
+	}
+	if exists {
+		err = as.authStorage.DeleteRefreshTokenSignature(uuid)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err = as.authStorage.AddRefreshTokenSignature(uuid, hash)
 	if err != nil {
 		return nil, err
@@ -82,9 +95,12 @@ func (as *AuthService) Refresh(refreshToken string, ip string) (*structs.Tokens,
 	if err != nil {
 		return nil, errors.ErrTokenIsNotValid
 	}
-	err = as.authStorage.DeleteRefreshTokenSignature(signatureHash)
+	err = as.authStorage.DeleteRefreshTokenSignature(&uuid)
 	if err != nil {
 		return nil, err
+	}
+	if ip != refresh.Ip {
+		mail.Send("test@mail.com", "Warning: someone used a refresh token under the following IP: "+ip)
 	}
 
 	return as.Get(&uuid, ip)
