@@ -70,7 +70,7 @@ func (as *AuthStorage) GetRefreshTokenSignature(uuid string) ([]byte, error) {
 	err := as.db.Pool.QueryRow(context.Background(),
 		"SELECT refresh_token_signature FROM auth WHERE uuid=$1",
 		uuid,
-	).Scan(signature)
+	).Scan(&signature)
 	if err != nil {
 		return nil, e.DatabaseError(err)
 	}

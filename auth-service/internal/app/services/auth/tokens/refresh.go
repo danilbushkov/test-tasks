@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/danilbushkov/test-tasks/internal/app/errors"
 	"github.com/google/uuid"
 )
 
@@ -23,11 +24,10 @@ func NewRefresh(ip string, uuid *uuid.UUID, exp time.Time) *RefreshToken {
 	}
 }
 
-// return token, signature, error
 func (rt *RefreshToken) Sign(key []byte) (*SignedRefreshToken, error) {
 	structure, err := json.Marshal(rt)
 	if err != nil {
-		return nil, err
+		return nil, errors.TokenError(err)
 	}
 	data := append(structure, key...)
 
